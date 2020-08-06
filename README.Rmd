@@ -1,0 +1,131 @@
+---
+title: "Efecto de borde"
+output: github_document
+author: David Triviño
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+setwd("C:/Users/David Esteban/Google Drive/Materias cursadas/Ecología Forestal II/Salida de Campo")
+```
+
+La información fue recolectada en San Rafael (Antioquia, Colombia) en primer semestre del 2016, como un ejercicio práctico del curso de ecología forestal II, el grupo de trabajo estaba conformado por los estudientes de ingeniería forestal Luis Meneses, Romario Portillo, Nicolas Echeverry y David Triviño. El ejercicio consto de dos transectos de 100m donde se midieron e identificaron los individuos mayores a 5cm de diametro. Se midio el diametro y la altura de estos. 
+
+```{r, results='hide', warning=FALSE}
+library(MASS)
+require(lattice)
+library(RColorBrewer)
+```
+
+```{r}
+grad=read.csv2("gradiente.csv")
+datos<-read.csv2("alturas.csv")
+datos$DAP=datos$CAP/pi
+datos$TRAN=as.factor(datos$TRAN)
+range(datos$DAP)
+range(datos$H)
+
+head(datos)
+head(grad)
+```
+
+
+
+
+### Distribución Dimetro ~ altura
+
+```{r}
+my.settings <- list(
+  superpose.polygon=list(col="red", border="black"),
+  strip.background=list(col="white"),
+  strip.border=list(col="black")
+)
+```
+
+```{r}
+histogram(~DAP|TRAN,datos, xlab = "DAP (cm)",ylab="Número de individuos",relation="same"
+          , col="white",type = "count", breaks = c(10,15,20,25,30,35,40))
+```
+
+```{r}
+datos2=subset(datos,TIPO=="Arb")
+histogram(~H|TRAN,datos2, xlab = "Altura (m)",ylab="Número de individuos",relation="same", 
+          col="white",type = "count",breaks = c(1,4,7,10,13,16,19,22))
+```
+
+
+## Gradiente
+
+```{r}
+color=c("chartreuse4","firebrick3","green","blue2","gold","gray35","darkorchid","cyan","black")
+grad=read.csv2("gradiente.csv")
+grad$TRAN=as.factor(grad$TRAN)
+```
+
+#### Cobertura herbácea
+
+```{r}
+my.settings <- list(
+  superpose.line=list(col=color, border="black"),
+  strip.border=list(col="black")
+)
+
+par(mfrow=c(1,1))
+{
+  xyplot(ABU~COBER|TRAN, groups=SP,grad,type="l",auto.key=list(space="bottom", columns=4, 
+  points=FALSE, lines=TRUE,title="Especies", cex.title=1),col=color,
+  par.settings = my.settings, 
+  ylab="Abundancia relativa (%)", xlab = "Cobertura herbácea (%)")
+}
+```
+
+#### Materia Orgánica
+
+```{r}
+xyplot(ABU~MO|TRAN, groups=SP,grad,type="l",auto.key=list(space="bottom", columns=4, 
+     points=FALSE, lines=TRUE,title="Especies", cex.title=1),col=color,
+       par.settings = list(superpose.line=list(col=color)), 
+       ylab="Abundancia relativa (%)", xlab = "Espesor de la materia orgánica (cm)")
+```
+
+#### Pendinte del terreno
+
+```{r}
+xyplot(ABU~PEN|TRAN, groups=SP,grad,type="l",auto.key=list(space="bottom", columns=4, 
+   points=FALSE, lines=TRUE,title="Especies", cex.title=1),col=color,
+       par.settings = list(superpose.line=list(col=color)), 
+       ylab="Abundancia relativa (%)", xlab = "Pendiente (°)")
+```
+
+#### Disponibilidad de luz
+
+```{r}
+xyplot(ABU~LUZ|TRAN, groups=SP,grad,type="l",auto.key=list(space="bottom", columns=4, 
+     points=FALSE, lines=TRUE,title="Especies", cex.title=1),col=color,
+       par.settings = list(superpose.line=list(col=color)), 
+       ylab="Abundancia relativa (%)", xlab = "Disponibilidad de luz(%)")
+```
+
+### Estructura dimétrica y altimétrica
+
+```{r}
+estructura=read.csv2("completo.csv")
+estructura$TRAN=as.factor(estructura$TRAN)
+estructura$sub=as.factor(estructura$sub)
+e50=subset(estructura, sub==50)
+e100=subset(estructura , sub==100)
+head(estructura)
+```
+
+```{r}
+histogram(~DAP|TRAN*sub,estructura, xlab = "DAP (cm)", ylab = "Número de individuos",
+          relation="same",col="white",type = "count", breaks = c(1,10,15,20,25,30,35,40))
+```
+
+```{r}
+histogram(~H|TRAN*sub,estructura, xlab = "Altura (m)", ylab = "Número de individuos",
+          relation="same",col="white",type = "count",breaks = c(1,4,7,10,13,16,19,22))
+```
+
+
+
